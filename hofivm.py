@@ -5,8 +5,12 @@ OP_FUNC = 4
 OP_RET = 5
 OP_ADD = 6
 OP_CALL = 7
+OP_INTVAR = 8
+OP_FLOATVAR = 9
+OP_STRVAR = 10
+OP_EXIT = 11
 
-functypes = {1: "int", 2: "float", 3: "string", 4: "var"}
+functypes = {1: "int", 2: "float", 3: "string", 4: "void"}
 
 class Vm:
     def __init__(self):
@@ -51,6 +55,30 @@ class Vm:
         self.bytecode.append(OP_CALL)
         self.bytecode.append(len(str(fname)))
         self.bytecode.extend(str(fname).encode("utf-8"))
+
+    def ivar(self, name, value):
+        self.bytecode.append(OP_INTVAR)
+        self.bytecode.append(len(str(name)))
+        self.bytecode.extend(str(name).encode("utf-8"))
+        self.bytecode.append(len(str(value)))
+        self.bytecode.extend(str(value).encode("utf-8"))
+
+    def fvar(self, name, value):
+        self.bytecode.append(OP_FLOATVAR)
+        self.bytecode.append(len(str(name)))
+        self.bytecode.extend(str(name).encode("utf-8"))
+        self.bytecode.append(len(str(value)))
+        self.bytecode.extend(str(value).encode("utf-8"))
+
+    def svar(self, name, value):
+        self.bytecode.append(OP_STRVAR)
+        self.bytecode.append(len(str(name)))
+        self.bytecode.extend(str(name).encode("utf-8"))
+        self.bytecode.append(len(str(value)))
+        self.bytecode.extend(str(value).encode("utf-8"))
+
+    def exitt(self):
+        self.bytecode.append(OP_EXIT)
 
     def comp(self, outname):
         with open(outname, "wb") as out:

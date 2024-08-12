@@ -1,0 +1,31 @@
+float fsum(float a, float b) {
+    return a + b;
+}
+
+int isum(int a, int b) {
+    return a + b;
+}
+
+void prtisum(int a, int b) {
+     show(a + b, "\n");
+}
+
+int main(int argc, string argv0) {
+    show("Hello world!\n");
+    
+    show("argc: ", argc, "\n");
+    show("argv0: ", argv0, "\n");
+    show("argc + 1: ", argc + 1, "\n");
+    
+    show("4.5 + (6.6 + 6.6) = ", fsum(4.5, fsum(6.6, 6.6)), "\n");
+    show("(450 + 4) + (560 + 54) = ", isum(isum(450, 4), isum(560, 54)), "\n");
+
+    int n1 = 10;
+    float n2 = n1 + 20.3;
+    float n3 = n1 + n2;
+    show("n1 = ", n1, "\nn2 = ", n2, "\nn1 + n2 = ", n3, "\n");
+
+    prtisum(10, 40);
+
+    exit(0);
+}

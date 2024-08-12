@@ -4,6 +4,15 @@ import hofivm as vm
 funcs = {}
 mem = []
 maxmem = 10500
+uexit = [False]
+
+for i, item in enumerate(sys.argv[::-1]):
+    if i == len(sys.argv) - 1:
+        pass
+    else:
+        mem.append(item)
+
+mem.append(len(sys.argv[1:]))
 
 regs = {"prt": 0, "nad": 0, "nbd": 0, "ncd": 0, "mad": 0, "mbd": 0, "mcd": 0}
 pvars = {}
@@ -91,50 +100,93 @@ def Exec(bytecode, rettype="int"):
                 funcs[fname][1].append(nlen)
                 funcs[fname][1].extend(name.encode("utf-8"))
             else:
-                if isint(name):
-                    if rettype == "int":
-                        mem.append(int(name))
+                if rettype != "void":
+                    if isint(name):
+                        if rettype == "int":
+                            mem.append(int(name))
+                        else:
+                            print("\nError: can't return int in type -> {}".format(rettype))
+                            exit(1)
+                    elif isfloat(name):
+                        if rettype == "float":
+                            mem.append(float(name))
+                        else:
+                            print("\nError: can't return float in type -> {}".format(rettype))
+                            exit(1)
+                    elif name in regs.keys():
+                        if isinstance(regs[name], int):
+                            if rettype == "int":
+                                mem.append(regs[name])
+                            else:
+                                print("\nError: can't return int in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(regs[name], float):
+                            if rettype == "float":
+                                mem.append(regs[name])
+                            else:
+                                print("\nError: can't return float in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(regs[name], str):
+                            if rettype == "string":
+                                meme.append(regs[name])
+                            else:
+                                print("\nError: can't return string in type -> {}".format(rettype))
+                                exit(1)
+                    elif name in lvars.keys():
+                        if isinstance(lvars[name][1], int):
+                            if rettype == "int":
+                                mem.append(lvars[name][1])
+                            else:
+                                print("\nError: can't return int in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(lvars[name][1], float):
+                            if rettype == "float":
+                                mem.append(lvars[name][1])
+                            else:
+                                print("\nError: can't return float in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(lvars[name][1], str):
+                            if rettype == "string":
+                                meme.append(lvars[name][1])
+                            else:
+                                print("\nError: can't return string in type -> {}".format(rettype))
+                                exit(1)
+                    elif name in pvars.keys():
+                        if isinstance(pvars[name][1], int):
+                            if rettype == "int":
+                                mem.append(pvars[name][1])
+                            else:
+                                print("\nError: can't return int in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(pvars[name][1], float):
+                            if rettype == "float":
+                                mem.append(pvars[name][1])
+                            else:
+                                print("\nError: can't return float in type -> {}".format(rettype))
+                                exit(1)
+                        elif isinstance(pvars[name][1], str):
+                            if rettype == "string":
+                                meme.append(pvars[name][1])
+                            else:
+                                print("\nError: can't return string in type -> {}".format(rettype))
+                                exit(1)
+                    elif name.startswith("\"") and name.endswith("\""):
+                        if rettype == "string":
+                            mem.append(name.replace("\"", "").replace("\\'", '"').replace("\\n", "\n").replace("\\t", "\t"))
+                        else:
+                            print("\nError: can't return string in type -> {}".format(rettype))
+                            exit(1)
+                    elif name.startswith("'") and name.endswith("'"):
+                        if rettype == "string":
+                            mem.append(name.replace("'", "").replace('\\"', "'").replace("\\n", "\n").replace("\\t", "\t"))
+                        else:
+                            print("\nError: can't return string in type -> {}".format(rettype))
+                            exit(1)
                     else:
-                        print("Error: can't return int in type -> {}".format(rettype))
-                        exit(1)
-                elif isfloat(name):
-                    if rettype == "float":
-                        mem.append(float(name))
-                    else:
-                        print("Error: can't return float in type -> {}".format(rettype))
-                        exit(1)
-                elif name in regs.keys():
-                    if rettype == "var":
-                        mem.append(regs[name])
-                    else:
-                        print("Error: can't return var in type -> {}".format(rettype))
-                        exit(1)
-                elif name in lvars.keys():
-                    if rettype == "var":
-                        mem.append(lvars[name][1])
-                    else:
-                        print("Error: can't return var in type -> {}".format(rettype))
-                        exit(1)
-                elif name in pvars.keys():
-                    if rettype == "var":
-                        mem.append(pvars[name][1])
-                    else:
-                        print("Error: can't return var in type -> {}".format(rettype))
-                        exit(1)
-                elif name.startswith("\"") and name.endswith("\""):
-                    if rettype == "string":
-                        mem.append(name.replace("\"", "").replace("\\'", '"').replace("\\n", "\n").replace("\\t", "\t"))
-                    else:
-                        print("Error: can't return string in type -> {}".format(rettype))
-                        exit(1)
-                elif name.startswith("'") and name.endswith("'"):
-                    if rettype == "string":
-                        mem.append(name.replace("'", "").replace('\\"', "'").replace("\\n", "\n").replace("\\t", "\t"))
-                    else:
-                        print("Error: can't return string in type -> {}".format(rettype))
+                        print("\nError: unknown register or variable name -> {}".format(name))
                         exit(1)
                 else:
-                    print("Error: unknown register or variable name -> {}".format(name))
+                    print("Error: can't return things with void function type!")
                     exit(1)
         elif op == vm.OP_FUNC:
             nlen = bytecode[pos]
@@ -148,12 +200,12 @@ def Exec(bytecode, rettype="int"):
         elif op == vm.OP_ADD:
             nlen1 = bytecode[pos]
             pos += 1
-            name1 = bytecode[pos:pos + nlen].decode("utf-8")
-            pos += nlen
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
             nlen2 = bytecode[pos]
             pos += 1
-            name2 = bytecode[pos:pos + nlen].decode("utf-8")
-            pos += nlen
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
             if len(fname):
                 funcs[fname][1].append(vm.OP_ADD)
                 funcs[fname][1].append(nlen1)
@@ -195,6 +247,113 @@ def Exec(bytecode, rettype="int"):
                 else:
                     print("Error: unknown function -> {}".format(name))
                     exit(1)
+        elif op == vm.OP_INTVAR:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_INTVAR)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name2))
+                    exit(1)
+                
+                lvars[name1] = ["int", name2]
+        elif op == vm.OP_FLOATVAR:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_FLOATVAR)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+                    
+                lvars[name1] = ["float", name2]
+        elif op == vm.OP_STRVAR:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_STRVAR)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+                    
+                lvars[name1] = ["string", name2]
+        elif op == vm.OP_EXIT:
+            if len(fname):
+                funcs[fname][1].append(vm.OP_EXIT)
+            else:
+                uexit[0] = True
+                exit(regs["mcd"])
+
+        for name, value in lvars.items():
+            if value[0] == "int":
+                if isinstance(value[1], int):
+                    pass
+                else:
+                    print("Error: use int values to int variables!")
+                    exit(1)
+            elif value[0] == "float":
+                if isinstance(value[1], float):
+                    pass
+                else:
+                    print("Error: use float values to float variables!")
+                    exit(1)
+            elif value[0] == "string":
+                if isinstance(value[1], str):
+                    pass
+                else:
+                    print("Error: use string to string variables!")
+                    exit(1)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -206,6 +365,12 @@ if __name__ == "__main__":
                 Exec(inp.read())
 
             Exec(funcs["main"][1], funcs["main"][0])
+            if not uexit[0]:
+                print("Segmentation fault")
+                print("use exit in your code!")
+                for i in range(0, 5):
+                    print("NOW!!!")
+                exit(255)
         else:
             print("Error: use '.hf' file extension")
             sys.exit(1)
