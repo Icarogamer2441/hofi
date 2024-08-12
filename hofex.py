@@ -31,7 +31,7 @@ def isfloat(value):
     except:
         return 0
 
-def Exec(bytecode, rettype="int"):
+def Exec(bytecode, rettype="void"):
     lvars = {}
     pos = 0
     fname = ""
@@ -334,6 +334,113 @@ def Exec(bytecode, rettype="int"):
             else:
                 uexit[0] = True
                 exit(regs["mcd"])
+        elif op == vm.OP_FUNCEND:
+            fname = ""
+        elif op == vm.OP_SUB:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_SUB)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+
+                if name1 in regs.keys():
+                    regs[name1] -= name2
+                elif name1 in lvars.keys():
+                    lvars[name1] -= name2
+                elif name1 in pvars.keys():
+                    pvars[name1] -= name2
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+        elif op == vm.OP_MUL:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_MUL)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+
+                if name1 in regs.keys():
+                    regs[name1] *= name2
+                elif name1 in lvars.keys():
+                    lvars[name1] *= name2
+                elif name1 in pvars.keys():
+                    pvars[name1] *= name2
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+        elif op == vm.OP_DIV:
+            nlen1 = bytecode[pos]
+            pos += 1
+            name1 = bytecode[pos:pos + nlen1].decode("utf-8")
+            pos += nlen1
+            nlen2 = bytecode[pos]
+            pos += 1
+            name2 = bytecode[pos:pos + nlen2].decode("utf-8")
+            pos += nlen2
+            if len(fname):
+                funcs[fname][1].append(vm.OP_DIV)
+                funcs[fname][1].append(nlen1)
+                funcs[fname][1].extend(name1.encode("utf-8"))
+                funcs[fname][1].append(nlen2)
+                funcs[fname][1].extend(name2.encode("utf-8"))
+            else:
+                if name2 in regs.keys():
+                    name2 = regs[name2]
+                elif name2 in lvars.keys():
+                    name2 = lvars[name2][1]
+                elif name2 in pvars.keys():
+                    name2 = pvars[name2][1]
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
+
+                if name1 in regs.keys():
+                    regs[name1] /= name2
+                elif name1 in lvars.keys():
+                    lvars[name1] /= name2
+                elif name1 in pvars.keys():
+                    pvars[name1] /= name2
+                else:
+                    print("Error: unknown register or variable name -> {}".format(name1))
+                    exit(1)
 
         for name, value in lvars.items():
             if value[0] == "int":

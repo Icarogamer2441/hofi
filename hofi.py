@@ -8,6 +8,7 @@ funcs = ["exit"]
 out.func("exit", 4)
 out.pop("mcd")
 out.exitt()
+out.funcend()
 
 t_int = "INTEGER"
 t_string = "STRING"
@@ -28,7 +29,6 @@ t_dctset = "DICTSET"
 t_equal = "EQUAL"
 t_not = "NOT"
 t_nequal = "NOTEQUAL"
-t_nl = "NEWLINE"
 t_comma = "COMMA"
 
 def is_float(s):
@@ -251,6 +251,141 @@ def comp3(code, lvarss=[]):
             else:
                 print("Error: use '(' to start functions arguments!")
                 exit(1)
+        elif token[0] == t_minus:
+            token = tokens[pos]
+            pos += 1
+            if token[0] == t_id and token[1] in funcs:
+                fname = token[1]
+                token = tokens[pos]
+                pos += 1
+                if token[0] == t_lparen:
+                    token = tokens[pos]
+                    pos += 1
+                    final = []
+                    argnum = 1
+                    while pos < len(tokens) and argnum > 0:
+                        if token[0] == t_lparen:
+                            argnum += 1
+                            final.append(token[1])
+                        elif token[0] == t_rparen:
+                            argnum -= 1
+                            if argnum > 0:
+                                final.append(token[1])
+                            else:
+                                break
+                        elif token[0] == t_comma:
+                            if argnum == 1:
+                                comp3(" ".join(final), lvars)
+                                final = []
+                            else:
+                                final.append(token[1])
+                        else:
+                            final.append(str(token[1]))
+                        token = tokens[pos]
+                        pos += 1
+                    if len(final):
+                        comp3(" ".join(final), lvars)
+                        final = []
+                    out.call(fname)
+                else:
+                    print("Error: use '(' to start function arguments!")
+                    exit(1)
+            else:
+                out.push(str(token[1]))
+            out.pop("mbd")
+            out.pop("mad")
+            out.sub("mad", "mbd")
+            out.push("mad")
+        elif token[0] == t_times:
+            token = tokens[pos]
+            pos += 1
+            if token[0] == t_id and token[1] in funcs:
+                fname = token[1]
+                token = tokens[pos]
+                pos += 1
+                if token[0] == t_lparen:
+                    token = tokens[pos]
+                    pos += 1
+                    final = []
+                    argnum = 1
+                    while pos < len(tokens) and argnum > 0:
+                        if token[0] == t_lparen:
+                            argnum += 1
+                            final.append(token[1])
+                        elif token[0] == t_rparen:
+                            argnum -= 1
+                            if argnum > 0:
+                                final.append(token[1])
+                            else:
+                                break
+                        elif token[0] == t_comma:
+                            if argnum == 1:
+                                comp3(" ".join(final), lvars)
+                                final = []
+                            else:
+                                final.append(token[1])
+                        else:
+                            final.append(str(token[1]))
+                        token = tokens[pos]
+                        pos += 1
+                    if len(final):
+                        comp3(" ".join(final), lvars)
+                        final = []
+                    out.call(fname)
+                else:
+                    print("Error: use '(' to start function arguments!")
+                    exit(1)
+            else:
+                out.push(str(token[1]))
+            out.pop("mbd")
+            out.pop("mad")
+            out.mul("mad", "mbd")
+            out.push("mad")
+        elif token[0] == t_div:
+            token = tokens[pos]
+            pos += 1
+            if token[0] == t_id and token[1] in funcs:
+                fname = token[1]
+                token = tokens[pos]
+                pos += 1
+                if token[0] == t_lparen:
+                    token = tokens[pos]
+                    pos += 1
+                    final = []
+                    argnum = 1
+                    while pos < len(tokens) and argnum > 0:
+                        if token[0] == t_lparen:
+                            argnum += 1
+                            final.append(token[1])
+                        elif token[0] == t_rparen:
+                            argnum -= 1
+                            if argnum > 0:
+                                final.append(token[1])
+                            else:
+                                break
+                        elif token[0] == t_comma:
+                            if argnum == 1:
+                                comp3(" ".join(final), lvars)
+                                final = []
+                            else:
+                                final.append(token[1])
+                        else:
+                            final.append(str(token[1]))
+                        token = tokens[pos]
+                        pos += 1
+                    if len(final):
+                        comp3(" ".join(final), lvars)
+                        final = []
+                    out.call(fname)
+                else:
+                    print("Error: use '(' to start function arguments!")
+                    exit(1)
+            else:
+                out.push(str(token[1]))
+            out.pop("mbd")
+            out.pop("mad")
+            out.div("mad", "mbd")
+            out.push("mad")
 
 def comp2(code, lvarss=[]):
     lvars = lvarss
@@ -920,6 +1055,7 @@ def comp1(code):
                             pos += 1
                         funcs.append(fname)
                         comp2(" ".join(finalcode), lvars)
+                        out.funcend()
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

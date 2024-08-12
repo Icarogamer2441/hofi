@@ -6,8 +6,20 @@ int isum(int a, int b) {
     return a + b;
 }
 
+float idiv(int a, int b) {
+      return a / b;
+}
+
+int imul(int a, int b) {
+    return a * b;
+}
+
 void prtisum(int a, int b) {
-     show(a + b, "\n");
+     show(a, " + ", b, " = ", a + b, "\n");
+}
+
+int isub(int a, int b) {
+    return a - b;
 }
 
 int main(int argc, string argv0) {
@@ -17,8 +29,8 @@ int main(int argc, string argv0) {
     show("argv0: ", argv0, "\n");
     show("argc + 1: ", argc + 1, "\n");
     
-    show("4.5 + (6.6 + 6.6) = ", fsum(4.5, fsum(6.6, 6.6)), "\n");
-    show("(450 + 4) + (560 + 54) = ", isum(isum(450, 4), isum(560, 54)), "\n");
+    show("4.5 + (6.6 + 6.6) = ", fsum(fsum(6.6, 6.6), 4.5), "\n");
+    show("(450 + 4) + (560 + 54) = ", isum(isum(560, 54), isum(450, 4)), "\n");
 
     int n1 = 10;
     float n2 = n1 + 20.3;
@@ -26,6 +38,10 @@ int main(int argc, string argv0) {
     show("n1 = ", n1, "\nn2 = ", n2, "\nn1 + n2 = ", n3, "\n");
 
     prtisum(10, 40);
+
+    show("10 * 20 = ", imul(20, 10), "\n");
+    show("340 - 130 = ", isub(130, 340), "\n");
+    show("40 - 20 = ", 40 - 20, "\n");
 
     exit(0);
 }

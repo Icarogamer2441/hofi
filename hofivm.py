@@ -9,6 +9,10 @@ OP_INTVAR = 8
 OP_FLOATVAR = 9
 OP_STRVAR = 10
 OP_EXIT = 11
+OP_FUNCEND = 12
+OP_SUB = 13
+OP_MUL = 14
+OP_DIV = 15
 
 functypes = {1: "int", 2: "float", 3: "string", 4: "void"}
 
@@ -79,6 +83,30 @@ class Vm:
 
     def exitt(self):
         self.bytecode.append(OP_EXIT)
+
+    def funcend(self):
+        self.bytecode.append(OP_FUNCEND)
+
+    def sub(self, rv1, rv2):
+        self.bytecode.append(OP_SUB)
+        self.bytecode.append(len(str(rv1)))
+        self.bytecode.extend(str(rv1).encode("utf-8"))
+        self.bytecode.append(len(str(rv2)))
+        self.bytecode.extend(str(rv2).encode("utf-8"))
+
+    def mul(self, rv1, rv2):
+        self.bytecode.append(OP_MUL)
+        self.bytecode.append(len(str(rv1)))
+        self.bytecode.extend(str(rv1).encode("utf-8"))
+        self.bytecode.append(len(str(rv2)))
+        self.bytecode.extend(str(rv2).encode("utf-8"))
+
+    def div(self, rv1, rv2):
+        self.bytecode.append(OP_DIV)
+        self.bytecode.append(len(str(rv1)))
+        self.bytecode.extend(str(rv1).encode("utf-8"))
+        self.bytecode.append(len(str(rv2)))
+        self.bytecode.extend(str(rv2).encode("utf-8"))
 
     def comp(self, outname):
         with open(outname, "wb") as out:
